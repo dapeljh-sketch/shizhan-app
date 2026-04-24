@@ -1,7 +1,24 @@
+# 系统文件
 .DS_Store
-**/.git
-english-vocabulary-master/24day5.50/
-english-vocabulary-master/ English-测试/
-前english-vocabulary-master/app/
--/
+.env
+*.log
+
+# 大型备份文件夹
+前english-vocabulary-master/
 背单词/
+-/
+
+# Python缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import random
 import json
+import pyttsx3
 
 # 页面配置
 st.set_page_config(page_title="英文单词学习工具", layout="wide", initial_sidebar_state="expanded")
@@ -131,20 +132,35 @@ else:
     # 显示单词
     st.markdown(f'<div class="big-word">{current_word["word"]}</div>', unsafe_allow_html=True)
     
-    # 显示中文含义（可点击按钮显示/隐藏）
-    col1, col2, col3 = st.columns(3)
+    # 发音功能
+    def speak_word(word):
+        try:
+            engine = pyttsx3.init()
+            engine.setProperty('rate', 150)  # 设置语速
+            engine.setProperty('volume', 0.8)  # 设置音量
+            engine.say(word)
+            engine.runAndWait()
+        except Exception as e:
+            st.error(f"发音失败: {e}")
+    
+    # 控制按钮
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
+        if st.button("🔊 发音", use_container_width=True, key="speak_btn"):
+            speak_word(current_word["word"])
+    
+    with col2:
         if st.button("👁️ 查看含义", use_container_width=True, key="show_meaning_btn"):
             st.session_state.show_meaning = not st.session_state.show_meaning
     
-    with col2:
+    with col3:
         if st.button("✅ 已掌握", use_container_width=True, key="learned_btn"):
             if current_word['word'] not in st.session_state.studied_words:
                 st.session_state.studied_words.add(current_word['word'])
                 st.session_state.learned_count += 1
             st.session_state.show_meaning = False
     
-    with col3:
+    with col4:
         if st.button("⏭️ 下一个", use_container_width=True, key="next_btn"):
             st.session_state.current_index = (st.session_state.current_index + 1) % len(st.session_state.words)
             st.session_state.show_meaning = False
@@ -157,7 +173,7 @@ else:
     
     # 进度显示
     st.markdown("---")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.markdown(f'<div class="stats">📍 当前: {st.session_state.current_index + 1} / {len(st.session_state.words)}</div>', unsafe_allow_html=True)
     with col2:
@@ -165,6 +181,9 @@ else:
     with col3:
         progress_pct = (st.session_state.learned_count / len(st.session_state.words) * 100) if st.session_state.words else 0
         st.markdown(f'<div class="stats">🎯 进度: {progress_pct:.1f}%</div>', unsafe_allow_html=True)
+    with col4:
+        remaining = len(st.session_state.words) - st.session_state.learned_count
+        st.markdown(f'<div class="stats">📚 剩余: {remaining}</div>', unsafe_allow_html=True)
     
     # 快速导航
     st.markdown("---")
